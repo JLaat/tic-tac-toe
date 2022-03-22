@@ -1,0 +1,37 @@
+* {
+    margin: 0;
+
+}
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/*Main content*/
+main {
+    flex:9 1 auto;
+    display: flex;
+}
+.left-side{
+    flex: auto;
+}
+/*.center === Gameboard element*/
+.center {
+    flex:2.5 1 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+}
+button {
+    font-size: 7rem;
+    font-family: Karumbi, Roboto, serif;
+}
+.right-side {
+    flex: auto;
+}
+
+/*Footer*/
+footer {
+flex: 1 1 auto;
+}

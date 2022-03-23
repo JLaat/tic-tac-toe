@@ -43,6 +43,7 @@ const domController = (() => {
         } else {
             gameBoard.setValue(sign.dataset.index, gameController.makeMove(sign.dataset.index));
             sign.textContent = gameBoard.getValue(sign.dataset.index);
+            gameController.checkWinner();
         }
     }));
 
@@ -66,17 +67,34 @@ const gameController = (() => {
         else {
             return;
         }
-    }
+    };
 
 
-    // Started making function to check winner, currently figuring out how to use for loops
     const checkWinner = () => {
-        for (let i = 0; i < gameBoard.winningIndexes.length; i++){
-
-        }
+        let partOfBoard = [];
+        for (let i = 0; i < 8; i++){
+            for (let j = 0; j < 3; j++) {
+                partOfBoard.push(gameBoard.getValue(gameBoard.winningIndexes[i][j]));
+                console.log(gameBoard.getValue(gameBoard.winningIndexes[i[j]]));
             }
+            if (areEquals(partOfBoard)){
+                console.log("game over");
+            }
+            partOfBoard = [];
+        }
+    };
 
-    return {makeMove};
+    const areEquals = (array) => {
+        if (array[0] === array[1] && array[1] === array[2]
+            && array[0] === ("X" || "O ")){
+            return true;
+        } else {
+            return false;
+        }
+    };
+
+
+    return {makeMove, checkWinner};
 })();
 
 

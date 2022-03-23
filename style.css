@@ -23,8 +23,8 @@ main {
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
 }
-button {
-    font-size: 7rem;
+.boardSpot   {
+    font-size: 5rem;
     font-family: Karumbi, Roboto, serif;
 }
 .right-side {

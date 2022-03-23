@@ -1,7 +1,19 @@
+// Player objective factory.
+const player = (symbol) => {
+    let playerSymbol = symbol;
+
+    const getSign = () => {
+        return playerSymbol;
+    }
+    return {getSign};
+};
+
 
 // Module for gameboard.
 const gameBoard = (() => {
-    let boardValues = ["1", "2", "3", "", "", "", "", "", ""];
+    let boardValues = ["", "", "", "", "", "", "", "", ""];
+
+    
 
     const getValue = (index) => {
         return boardValues[index];
@@ -14,49 +26,40 @@ const gameBoard = (() => {
     return {getValue, setValue, boardValues};
 })();
 
-// Player objective factory.
-const player = (symbol) => {
-    this.playerSymbol = symbol;
-
-
-
-    return {};
-};
 
 // All DOM stuff here.
 const domController = (() => {
     let boardSigns = document.querySelectorAll(".boardSpot");
 
 
-    boardSigns.forEach(sign => addEventListener("click", function () {
-        gameBoard.setValue(sign.dataset.index, gameController.makeMove());
-        sign.textContent = gameBoard.getValue(sign.dataset.index);
+    boardSigns.forEach(sign => sign.addEventListener("click", function () {
+        if (gameBoard.getValue(sign.dataset.index) !== ""){
+            console.log("nonii")
+        } else {
+            gameBoard.setValue(sign.dataset.index, gameController.makeMove(sign.dataset.index));
+            sign.textContent = gameBoard.getValue(sign.dataset.index);
+        }
     }));
-
-    // I was solving below a bug where setValue gets repeated for all buttons
-    const setListeners = () => {
-
-    }
-
-
-
-
 
     return {};
 })();
 
+// Module for controlling gameflow.
 const gameController = (() => {
     const playerOne = player("X");
     const playerTwo = player("O");
     let playerOneTurn = true;
 
-    const makeMove = () => {
-        if (playerOneTurn) {
+    const makeMove = (index) => {
+        if (playerOneTurn && gameBoard.getValue(index) === "") {
             playerOneTurn = false;
-            return "X";
-        } else {
+            return playerOne.getSign(index);
+        } else if (!playerOneTurn && gameBoard.getValue(index) === ""){
             playerOneTurn = true;
-            return "O";
+            return playerTwo.getSign(index);
+        }
+        else {
+            return;
         }
     }
 

@@ -18,7 +18,6 @@ const gameBoard = (() => {
          [0, 3, 6], [1, 4, 7], [2, 5, 8],
          [0, 4, 8], [2, 4, 6]];
 
-
     const getValue = (index) => {
         return boardValues[index];
     }
@@ -38,8 +37,10 @@ const gameBoard = (() => {
 const domController = (() => {
     let boardSigns = document.querySelectorAll(".boardSpot");
     const btnRestart = document.querySelector(".restart");
-    let playerOneName = document.querySelector("#playerOne").value;
-    let playerTwoName = document.querySelector("#playerTwo").value;
+    const btnHuman = document.querySelector(".btnSelectHuman");
+    const btnComputer = document.querySelector(".btnSelectAi");
+
+
 
 
     // Event listeners for board spots
@@ -60,6 +61,15 @@ const domController = (() => {
         resetBoard();
     })
 
+    // Event listeners for opponent selection buttons.
+    btnHuman.addEventListener("click", () => {
+        document.querySelector(".beginning-screen").style.display ="none";
+    });
+    btnComputer.addEventListener("click", () => {
+        document.querySelector(".beginning-screen").style.display = "none";
+    })
+
+
     const resetBoard = () => {
         gameBoard.resetArray();
         boardSigns.forEach(sign => sign.textContent = "");
@@ -69,9 +79,9 @@ const domController = (() => {
     const announceWinner = () => {
         document.querySelector(".modal-container").style.display ="inline";
         if (gameController.playerOneTurn) {
-            document.querySelector(".modal-text").textContent = `Nice ${playerOneName}, you won!`;
+            document.querySelector(".modal-text").textContent = `Nice, you won!`;
         } else {
-            document.querySelector(".modal-text").textContent = `Nice ${playerTwoName}, you won!`;
+            document.querySelector(".modal-text").textContent = `Nice, you won!`;
         }
         btnRestart.disabled = false;
     }
@@ -79,6 +89,10 @@ const domController = (() => {
         document.querySelector(".modal-container").style.display ="inline";
         document.querySelector(".modal-text").textContent = "It's a tie!";
         btnRestart.disabled = false;
+    }
+
+    const computerPlay = () => {
+
     }
 
     return {announceWinner, announceTie};
@@ -90,6 +104,7 @@ const gameController = (() => {
     const playerOne = player("X");
     const playerTwo = player("O");
     let playerOneTurn = true;
+    let computerSelected = false;
     let roundCount = 0;
 
     const makeMove = (index) => {
@@ -107,6 +122,11 @@ const gameController = (() => {
         }
     };
 
+    // Started making AI
+    const computerMakeMove = () => {
+
+    }
+
 
     const checkWinner = () => {
         let partOfBoard = [];
@@ -115,6 +135,7 @@ const gameController = (() => {
                 partOfBoard.push(gameBoard.getValue(gameBoard.winningIndexes[i][j]));
                 console.log(gameBoard.getValue(gameBoard.winningIndexes[i[j]]));
             }
+            // === If win condition is met
             if (areEquals(partOfBoard)){
                 console.log("game over");
                 domController.announceWinner();
@@ -123,9 +144,11 @@ const gameController = (() => {
             }
             partOfBoard = [];
         }
+        // === If it's a tie
         if (roundCount === 9){
             domController.announceTie();
             roundCount = 0;
+            playerOneTurn = true;
         }
     };
 

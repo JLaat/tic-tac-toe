@@ -47,10 +47,14 @@ const domController = (() => {
     boardSigns.forEach(sign => sign.addEventListener("click", function () {
         if (gameBoard.getValue(sign.dataset.index) !== ""){
             console.log("nonii")
-        } else {
+        }
+        else {
             gameBoard.setValue(sign.dataset.index, gameController.makeMove(sign.dataset.index));
             sign.textContent = gameBoard.getValue(sign.dataset.index);
             gameController.checkWinner();
+            if (gameController.computerSelected && !gameController.playerOneTurn) {
+                computerPlay();
+            }
         }
     }));
 
@@ -66,6 +70,7 @@ const domController = (() => {
         document.querySelector(".beginning-screen").style.display ="none";
     });
     btnComputer.addEventListener("click", () => {
+        gameController.computerSelected = true;
         document.querySelector(".beginning-screen").style.display = "none";
     })
 
@@ -91,8 +96,11 @@ const domController = (() => {
         btnRestart.disabled = false;
     }
 
+    // AI
     const computerPlay = () => {
-
+        let index = gameController.computerMakeMove();
+        boardSigns[index].textContent = gameBoard.getValue(index);
+        gameController.checkWinner();
     }
 
     return {announceWinner, announceTie};
@@ -122,9 +130,19 @@ const gameController = (() => {
         }
     };
 
-    // Started making AI
+    // AI
     const computerMakeMove = () => {
-
+        if (!playerOneTurn && computerSelected) {
+            let randomNumber = Math.floor(Math.random() * 8);
+            if (gameBoard.getValue(randomNumber) !== ""){
+                computerMakeMove();
+            }
+            gameBoard.setValue(randomNumber, "O");
+            playerOneTurn = true;
+            roundCount++;
+            console.log(randomNumber);
+            return randomNumber;
+        }
     }
 
 
@@ -162,7 +180,7 @@ const gameController = (() => {
     };
 
 
-    return {makeMove, checkWinner, playerOneTurn};
+    return {makeMove, checkWinner, playerOneTurn, computerSelected, computerMakeMove};
 })();
 
 

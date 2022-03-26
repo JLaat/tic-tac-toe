@@ -8,13 +8,6 @@ const player = (symbol) => {
     return {getSign};
 };
 
-// Module for AI.
-const AI = () => {
-    // Minimax algorithm
-    const minimax = () => {
-
-    }
-}
 
 // Module for gameboard.
 const gameBoard = (() => {
@@ -36,7 +29,7 @@ const gameBoard = (() => {
         boardValues = ["", "", "", "", "", "", "", "", ""];
     }
 
-    return {getValue, setValue, winningIndexes, resetArray};
+    return {getValue, setValue, winningIndexes, resetArray, boardValues};
 })();
 
 
@@ -104,9 +97,11 @@ const domController = (() => {
 
     // AI
     const computerPlay = () => {
-        let index = gameController.computerMakeMove();
-        domController.boardSigns.item(index).textContent = gameBoard.getValue(index);
-        gameController.checkWinner();
+        if (gameController.computerSelected && !gameController.playerOneTurn) {
+            let index = AI.getBestMove();
+            domController.boardSigns.item(index).textContent = gameBoard.getValue(index);
+            gameController.checkWinner();
+        }
     }
 
     return {announceWinner, announceTie, boardSigns};
@@ -120,6 +115,7 @@ const gameController = (() => {
     let playerOneTurn = true;
     let computerSelected = false;
     let roundCount = 0;
+    let winnerSign = "";
 
     const makeMove = (index) => {
         if (gameController.playerOneTurn && gameBoard.getValue(index) === "") {
@@ -135,23 +131,6 @@ const gameController = (() => {
             return;
         }
     };
-
-    // AI
-    const computerMakeMove = () => {
-        if (!gameController.playerOneTurn && gameController.computerSelected) {
-            let randomNumber = Math.floor(Math.random() * 8);
-            if (gameBoard.getValue(randomNumber) !== ""){
-                computerMakeMove();
-            } else {
-                gameBoard.setValue(randomNumber, "O");
-                gameController.playerOneTurn = true;
-                roundCount++;
-                console.log(randomNumber);
-                return randomNumber;
-            }
-        }
-    }
-
 
     const checkWinner = () => {
         let partOfBoard = [];
@@ -178,15 +157,97 @@ const gameController = (() => {
 
     const areEquals = (array) => {
         if (array[0] === array[1] && array[1] === array[2]
-            && (array[0] === "X" || array[0] === "O")){
+            && array[0] === "X"){
+            gameController.winnerSign = "X";
             return true;
-        } else {
+        } else if (array[0] === array[1] && array[1] === array[2]
+            && array[0] === "O") {
+            gameController.winnerSign = "O";
+            return true;
+        }
+
+        else {
             return false;
         }
     };
 
 
-    return {makeMove, checkWinner, playerOneTurn, computerSelected, computerMakeMove};
+    return {makeMove, checkWinner, playerOneTurn, computerSelected, winnerSign, areEquals};
+})();
+
+
+// Module for AI.
+const AI = (() => {
+    let playerTurn = gameController.playerOneTurn;
+    // Minimax algorithm
+    const minimax = (newBoard) => {
+        let availableSquares = getEmptySquares(newBoard);
+        let moves = [];
+
+        // Base
+        if (gameController.areEquals(newBoard) && gameController.winnerSign === "X"){
+            return {score: -10};
+        } else if (gameController.areEquals(newBoard) && gameController.winnerSign === "O"){
+            return {score: 10};
+        } else if (availableSquares.length === 0){
+            return {score: 0};
+        }
+
+        // Loop through empty spaces
+        for (let i = 0; availableSquares.length; i++) {
+            let id = availableSquares[i];
+            let move = {};
+            move.id = id;
+
+            let savedBoardSpace = newBoard[id];
+            // Check whose turn it is
+            if (playerTurn) {
+                newBoard[i] = "X";
+            } else {
+                newBoard[i] = "O";
+            }
+            // Recursion
+            if (playerTurn) {
+                AI.playerTurn = !AI.playerTurn;
+                move.score = minimax(newBoard).score;
+            } else {
+                AI.playerTurn = !AI.playerTurn;
+                move.score = minimax(newBoard).score;
+            }
+            newBoard[id] = savedBoardSpace;
+            moves.push(move);
+        }
+
+        let bestMove;
+        if (playerTurn) {
+            let bestScore = -Infinity;
+            for (let i = 0; moves.length; i++) {
+                if (moves[i].score > bestScore) {
+                    bestScore = moves[i].score;
+                    bestMove = moves[i];
+                }
+            }
+        } else{
+            let bestScore = +Infinity;
+            for (let i = 0; moves.length; i++) {
+                if (moves[i].score > bestScore) {
+                    bestScore = moves[i].score;
+                    bestMove = moves[i];
+                }
+            }
+        }
+        return bestMove;
+    }
+
+    const getEmptySquares = (newBoard) => {
+        return newBoard.filter(square => square.length === 0);
+    }
+
+    const getBestMove = () => {
+        return minimax(gameBoard.boardValues).index;
+    }
+
+    return {getBestMove, playerTurn};
 })();
 
 

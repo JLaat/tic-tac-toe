@@ -52,9 +52,8 @@ const domController = (() => {
             gameBoard.setValue(sign.dataset.index, gameController.makeMove(sign.dataset.index));
             sign.textContent = gameBoard.getValue(sign.dataset.index);
             gameController.checkWinner();
-            if (gameController.computerSelected && !gameController.playerOneTurn) {
-                computerPlay();
-            }
+            computerPlay();
+
         }
     }));
 
@@ -99,11 +98,11 @@ const domController = (() => {
     // AI
     const computerPlay = () => {
         let index = gameController.computerMakeMove();
-        boardSigns[index].textContent = gameBoard.getValue(index);
+        domController.boardSigns.item(index).textContent = gameBoard.getValue(index);
         gameController.checkWinner();
     }
 
-    return {announceWinner, announceTie};
+    return {announceWinner, announceTie, boardSigns};
 })();
 
 
@@ -116,12 +115,12 @@ const gameController = (() => {
     let roundCount = 0;
 
     const makeMove = (index) => {
-        if (playerOneTurn && gameBoard.getValue(index) === "") {
-            playerOneTurn = false;
+        if (gameController.playerOneTurn && gameBoard.getValue(index) === "") {
+            gameController.playerOneTurn = false;
             roundCount++;
             return playerOne.getSign(index);
-        } else if (!playerOneTurn && gameBoard.getValue(index) === ""){
-            playerOneTurn = true;
+        } else if (!gameController.playerOneTurn && gameBoard.getValue(index) === ""){
+            gameController.playerOneTurn = true;
             roundCount++;
             return playerTwo.getSign(index);
         }
@@ -132,16 +131,17 @@ const gameController = (() => {
 
     // AI
     const computerMakeMove = () => {
-        if (!playerOneTurn && computerSelected) {
+        if (!gameController.playerOneTurn && gameController.computerSelected) {
             let randomNumber = Math.floor(Math.random() * 8);
             if (gameBoard.getValue(randomNumber) !== ""){
                 computerMakeMove();
+            } else {
+                gameBoard.setValue(randomNumber, "O");
+                gameController.playerOneTurn = true;
+                roundCount++;
+                console.log(randomNumber);
+                return randomNumber;
             }
-            gameBoard.setValue(randomNumber, "O");
-            playerOneTurn = true;
-            roundCount++;
-            console.log(randomNumber);
-            return randomNumber;
         }
     }
 
@@ -151,7 +151,6 @@ const gameController = (() => {
         for (let i = 0; i < 8; i++){
             for (let j = 0; j < 3; j++) {
                 partOfBoard.push(gameBoard.getValue(gameBoard.winningIndexes[i][j]));
-                console.log(gameBoard.getValue(gameBoard.winningIndexes[i[j]]));
             }
             // === If win condition is met
             if (areEquals(partOfBoard)){

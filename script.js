@@ -8,6 +8,13 @@ const player = (symbol) => {
     return {getSign};
 };
 
+// Module for AI.
+const AI = () => {
+    // Minimax algorithm
+    const minimax = () => {
+
+    }
+}
 
 // Module for gameboard.
 const gameBoard = (() => {
